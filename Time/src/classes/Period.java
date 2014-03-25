@@ -8,6 +8,7 @@ package classes;
 
 import fontys.time.IPeriod;
 import fontys.time.ITime;
+import java.util.Calendar;
 
 /**
  *
@@ -99,7 +100,29 @@ public class Period implements IPeriod {
 
     @Override
     public IPeriod intersectionWith(IPeriod period) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        Calendar thisEndCal = Calendar.getInstance();
+        thisEndCal.setTimeInMillis(0);
+        thisEndCal.set(period.getEndTime().getYear(), period.getEndTime().getMonth(), period.getEndTime().getDay(), period.getEndTime().getHours(), period.getEndTime().getMinutes());
+        
+        Calendar periodBeginCal = Calendar.getInstance();
+        periodBeginCal.setTimeInMillis(0);
+        periodBeginCal.set(period.getBeginTime().getYear(), period.getBeginTime().getMonth(), period.getBeginTime().getDay(), period.getBeginTime().getHours(), period.getBeginTime().getMinutes());
+               
+        if (thisEndCal.after(periodBeginCal))
+        {
+            if (period.length() > this.length()){
+                return period;
+            }
+            else
+            {
+                return this;
+            }             
+        }
+        else
+        { 
+            return null;
+        }
+
     }
     
 }
