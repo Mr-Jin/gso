@@ -48,11 +48,12 @@ public class Contact {
      */
    boolean addAppointment(Appointment b){
        for(Appointment a: this.agenda){
-           if(a.getPeriod().getBeginTime().compareTo(b.getPeriod().getEndTime())<0 || a.getPeriod().getEndTime().compareTo(b.getPeriod().getBeginTime())>0 )
+           if(b.getPeriod().intersectionWith(a.getPeriod()) != null)
            {
                return false;
            }
        }
+       this.agenda.add(b);
        return true;
            
    }
