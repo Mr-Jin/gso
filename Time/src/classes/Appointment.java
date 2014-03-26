@@ -32,7 +32,7 @@ class Appointment {
     }
     
     public Iterator<Contact> invitees(){
-        
+        return this.invitees.iterator();
     }
     
     public boolean AddContact(Contact c)
@@ -42,7 +42,7 @@ class Appointment {
     
     public void RemoveContact(Contact o)
     {
-        
+        this.invitees.remove(o);
     }
     
 }
