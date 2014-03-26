@@ -7,6 +7,7 @@
 package classes;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
  *
@@ -60,13 +61,12 @@ public class Contact {
     * @param a de te verwijderen appointment
     */
    void removeAppointment(Appointment a){
-       
+       this.agenda.remove(a);
    }
     
-    
-}
-
     public Iterator<Appointment> Appointments()
     {
-
+        return this.agenda.iterator();
     }
+    
+}
