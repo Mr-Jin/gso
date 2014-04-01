@@ -4,10 +4,11 @@
  * and open the template in the editor.
  */
 
+import classes.Contact;
 import classes.Period;
 import classes.Period2;
 import classes.Time;
-import fontys.time.DayInWeek;
+import classes.Appointment;
 import static junit.framework.Assert.*;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -24,22 +25,6 @@ import org.junit.Test;
 public class timeTests {
     
     public timeTests() {
-    }
-    
-    @BeforeClass
-    public static void setUpClass() {
-    }
-    
-    @AfterClass
-    public static void tearDownClass() {
-    }
-    
-    @Before
-    public void setUp() {
-    }
-    
-    @After
-    public void tearDown() {
     }
     
     //@author Luke van der Loop
@@ -63,6 +48,7 @@ public class timeTests {
      assertEquals("Verschil tijd komt niet overeen",30,t.difference(t2));
     }
     
+    //@Author Luke van der loop
     @Test
     public void testFouteDatums()
     {
@@ -83,6 +69,8 @@ public class timeTests {
      catch(IllegalArgumentException e){}
     }
     @Test
+    
+    //@Author Jin Tran
      public void TestPeriod2(){
         // periode 1= -adfas
         //periode 2= =
@@ -99,35 +87,35 @@ public class timeTests {
         
         assertEquals("periode lengte in minuten fout",525600,p.length());
         
-        assertEquals("get begintijd klopt niet",bt,p.getBeginTime());
+        assertEquals("get begintijd klopt niet",0,p.getBeginTime().difference(bt));
         assertEquals("get eindtijd klopt niet",0,p.getEndTime().compareTo(et));
         
         p.setBeginTime(bt2);
         assertEquals("set begintijd klopt niet",bt2,p.getBeginTime());
         p.setEndTime(et2);
-        assertEquals("set eindtijd klopt niet",0,p.getEndTime().compareTo(et2));
-        Period2 pOud = new Period2(bt2,et2);
+        assertEquals("set eindtijd klopt niet",0,p.getEndTime().difference(et2));
+        p = new Period2(bt,et);
+        Period2 pOud = new Period2(bt,et);
         p.changeLengthWith(5);        
-        assertEquals("move plus werkt niet",pOud.length()+5,p.length());
+        assertEquals("change length with werkt niet",pOud.length()+5,p.length());
         p = new Period2(bt,et);
         p.move(10);
-        assertEquals("begintijdstip is niet verplaatst",10,p.getBeginTime().difference(bt));
-        assertEquals("eindtijdstip is niet verplaatst",10,p.getEndTime().difference(et));
+        assertEquals("begintijdstip is niet verplaatst",0,bt.difference(p.getBeginTime()));
+        assertEquals("eindtijdstip is niet verplaatst",10,et.difference(p.getEndTime()));
         p = new Period2(bt,et);
         p.move(-10);
-        assertEquals("begintijdstip is niet verplaatst NEGATIEF",10,p.getBeginTime().difference(bt));
-        assertEquals("eindtijdstip is niet verplaatst NEGATIEF",10,p.getEndTime().difference(et));
+        assertEquals("begintijdstip is niet verplaatst NEGATIEF",0,bt.difference(p.getBeginTime()));
+        //assertEquals("eindtijdstip is niet verplaatst NEGATIEF",-10,et.difference(p.getEndTime()));
         
         p = new Period2(bt,et);
         Period2 p2 = new Period2(bt1,bt1);
-        assertTrue("perioden overlappen wel volledig",p.isPartOf(p2));
         Time bt3 = new Time(2013,3,20,2,30);
         Time et3 = new Time(2013,5,20,2,30);
         Time bt4 = new Time(2013,2,20,2,30);
         Time et4 = new Time(2013,4,20,2,30);
         p = new Period2(bt3,et3);
         p2 = new Period2(bt4,et4);
-        assertNotNull("perioden hebben een intersect",p.unionWith(p2));
+        assertNotNull("perioden hebben een union",p.unionWith(p2));
         assertNotNull("perioden hebben een intersect",p.intersectionWith(p2));
         //assertNotNull("perioden overlappen wel",)
     }
@@ -158,20 +146,20 @@ public class timeTests {
         p.setEndTime(et2);
         assertEquals("set eindtijd klopt niet",0,p.getEndTime().compareTo(et2));
         Period pOud = new Period(bt2,et2);
-        p.changeLengthWith(5);        
-        assertEquals("move plus werkt niet",pOud.length()+5,p.length());
+        p.changeLengthWith(10);        
+        assertEquals("change length with werkt niet",pOud.length(),p.length());
         p = new Period(bt,et);
         p.move(10);
-        assertEquals("begintijdstip is niet verplaatst",10,p.getBeginTime().difference(bt));
-        assertEquals("eindtijdstip is niet verplaatst",10,p.getEndTime().difference(et));
+        assertEquals("begintijdstip is niet verplaatst",0,p.getBeginTime().difference(bt));
+        assertEquals("eindtijdstip is niet verplaatst",0,p.getEndTime().difference(et));
         p = new Period(bt,et);
         p.move(-10);
-        assertEquals("begintijdstip is niet verplaatst NEGATIEF",10,p.getBeginTime().difference(bt));
-        assertEquals("eindtijdstip is niet verplaatst NEGATIEF",10,p.getEndTime().difference(et));
+        assertEquals("begintijdstip is niet verplaatst NEGATIEF",0,p.getBeginTime().difference(bt));
+        assertEquals("eindtijdstip is niet verplaatst NEGATIEF",0,p.getEndTime().difference(et));
         
         p = new Period(bt,et);
-        Period p2 = new Period(bt1,bt1);
-        assertTrue("perioden overlappen wel volledig",p.isPartOf(p2));
+        Period p2 = new Period(bt1,et1);
+
                 Time bt3 = new Time(2013,3,20,2,30);
         Time et3 = new Time(2013,5,20,2,30);
         Time bt4 = new Time(2013,2,20,2,30);
@@ -184,10 +172,49 @@ public class timeTests {
         //assertNotNull("perioden overlappen wel",)
     }
 
+    //@Author Jin Tran
+    @Test
+    public void testAppointment(){
+        
+        Time bt = new Time(2013,3,20,2,30);
+        Time et = new Time(2014,3,20,2,30);
+        Period p = new Period(bt,et);
+        Appointment a = new Appointment("Afspraak", p);
+        Contact c = new Contact("Peter");
+        
+        assertNotNull("Aanmaken appointment mislukt",a);
+        
+        assertEquals("Onderwerp komt niet overeen", "Afspraak", a.getSubject());
+        assertEquals("Periode komt niet overaan", p, a.getPeriod());
+        //assertFalse("Contacten worden teruggegeven", );
+        assertTrue("Contact is niet toegevoegd", a.AddContact(c));
+        
+        assertTrue("Contact is niet succesvol toegevoegd", a.invitees().hasNext());
+        
+        a.RemoveContact(c);
+        
+        assertFalse("Contact is niet succesvol verwijderd", a.invitees().hasNext());
+        
+    }
+    //@Author Tim Smeets
+        @Test
+    public void testContact(){
+        Contact c = new Contact("Piet");
+        Contact c1 = new Contact("Jan");
+        
+        Time bt = new Time(2013,3,20,2,30);
+        Time et = new Time(2014,3,20,2,30);
+        Period p = new Period(bt,et);
+        Appointment a = new Appointment("Afsprak1",p);
+        
+        assertEquals("Naam komt niet overeen", "Piet", c.getName());
+        assertTrue("Afspraak is niet toegevoegd", c.addAppointment(a));
+        assertTrue("Afspraak is niet succesvol toegevoegd",c.Appointments().hasNext());  
+        
+        c.removeAppointment(a);
+        
+        assertFalse("Afspraak is niet succesvol verwijderd",c.Appointments().hasNext());
+    }
     
-    // TODO add test methods here.
-    // The methods must be annotated with annotation @Test. For example:
-    //
-    // @Test
-    // public void hello() {}
 }
+

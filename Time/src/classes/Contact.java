@@ -3,7 +3,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package classes;
 
 import java.util.ArrayList;
@@ -19,55 +18,63 @@ public class Contact {
      * bevat afspraken voor agenda
      */
     private ArrayList<Appointment> agenda;
-    
+
     /**
      * naam van contact
      */
     private String name;
-    
+
     /**
-     *  constructor
+     * constructor
+     *
      * @param name naam van contact
      */
-    public Contact(String name){
+    public Contact(String name) {
         this.name = name;
-        this.agenda = new ArrayList();
+        this.agenda = new ArrayList<Appointment>();
     }
-    
+
     /**
      *
      * @return naam van contact
      */
-    public String getName(){
+    public String getName() {
         return this.name;
     }
+
     /**
-     * 
+     *
      * @param a appointment
      * @return kan worden geplaatst of niet
      */
-   boolean addAppointment(Appointment b){
-       for(Appointment a: this.agenda){
-           if(b.getPeriod().intersectionWith(a.getPeriod()) != null)
-           {
-               return false;
-           }
-       }
-       this.agenda.add(b);
-       return true;
-           
-   }
-   /**
-    * verwijder afspraak uit agenda
-    * @param a de te verwijderen appointment
-    */
-   void removeAppointment(Appointment a){
-       this.agenda.remove(a);
-   }
-    
-    public Iterator<Appointment> Appointments()
-    {
+    public boolean addAppointment(Appointment b) {
+        if (Appointments() == null) {
+            this.agenda.add(b);
+            return true;
+        } else {
+
+            for (Appointment a : this.agenda) {
+                if (b.getPeriod().intersectionWith(a.getPeriod()) != null) {
+                    return false;
+                }
+            }
+            this.agenda.add(b);
+        }
+        return true;
+
+    }
+
+    /**
+     * verwijder afspraak uit agenda
+     *
+     * @param a de te verwijderen appointment
+     */
+    public void removeAppointment(Appointment a) {
+        this.agenda.remove(a);
+    }
+
+    public Iterator<Appointment> Appointments() {
         return this.agenda.iterator();
     }
-    
+
 }

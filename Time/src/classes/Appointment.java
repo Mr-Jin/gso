@@ -14,7 +14,7 @@ import java.util.Iterator;
  *
  * @author tim
  */
-class Appointment {
+public class Appointment {
     private String subject;
     private IPeriod period;
     private ArrayList<Contact> invitees;
@@ -29,6 +29,7 @@ class Appointment {
     public Appointment(String subject, IPeriod period){
         this.subject = subject;
         this.period = period;
+        this.invitees = new ArrayList<Contact>();
         }
     
     /**
@@ -62,6 +63,13 @@ class Appointment {
      */
     public boolean AddContact(Contact c)
     {
+        if(c.Appointments() == null)
+        {
+            this.invitees.add(c);
+            return true;
+        }
+        else
+        {
         while(c.Appointments().hasNext())
         {
             Appointment a = c.Appointments().next();
@@ -71,6 +79,7 @@ class Appointment {
             }
         }
         this.invitees.add(c);
+        }
         return true;
     }
     

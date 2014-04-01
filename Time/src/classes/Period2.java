@@ -3,7 +3,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package classes;
 
 import fontys.time.IPeriod;
@@ -13,16 +12,20 @@ import fontys.time.ITime;
  *
  * @author tim smeets
  */
-public class Period2 implements IPeriod{
+public class Period2 implements IPeriod {
+
     ITime bt;
     long duur;
-    
-    public Period2(ITime bt, ITime et) {
-        this.bt = bt;
-        this.duur = bt.difference(et);
+
+    public Period2(ITime bt, ITime et) throws IllegalArgumentException {
+        if (bt.difference(et) < 0) {
+            throw new IllegalArgumentException("Begintijd mag niet voor Eindtijd liggen");
+        } else {
+            this.bt = bt;
+            this.duur = bt.difference(et);
+        }
     }
-    
-    
+
     @Override
     public ITime getBeginTime() {
         return this.bt;
@@ -30,24 +33,24 @@ public class Period2 implements IPeriod{
 
     @Override
     public ITime getEndTime() {
-        Time t = new Time(this.bt.getYear(),this.bt.getMonth(),this.bt.getDay(),this.bt.getHours(),this.bt.getMinutes());
+        Time t = new Time(this.bt.getYear(), this.bt.getMonth(), this.bt.getDay(), this.bt.getHours(), this.bt.getMinutes());
         t.plus((int) duur);
         return t;
     }
 
     @Override
     public int length() {
-       return (int) this.duur;
+        return (int) this.duur;
     }
 
     @Override
     public void setBeginTime(ITime beginTime) {
-       this.bt = beginTime;
+        this.bt = beginTime;
     }
 
     @Override
     public void setEndTime(ITime endTime) {
-       this.duur = endTime.difference(bt);
+        this.duur = bt.difference(endTime);
     }
 
     @Override
@@ -62,43 +65,45 @@ public class Period2 implements IPeriod{
 
     @Override
     public boolean isPartOf(IPeriod period) {
-        if(period.getBeginTime().compareTo(this.getBeginTime())>0&& this.length() <= period.length() ){
+        if (period.getBeginTime().compareTo(this.getBeginTime()) >= 0 && this.length() <= period.length()) {
             return true;
         }
         return false;
     }
-    
-    
+
     /**
-     * 
+     *
      * @param period de te vergelijken periode
      * @return true wanner ze kruisen false wanner dit niet zo is
      */
-    public boolean isIntersect(IPeriod period){
-        if(this.getBeginTime().compareTo(period.getEndTime())<0 || this.getEndTime().compareTo(period.getBeginTime())>0 ){
+    public boolean isIntersect(IPeriod period) {
+        if (this.getBeginTime().compareTo(period.getEndTime()) < 0 || this.getEndTime().compareTo(period.getBeginTime()) > 0) {
             return false;
         }
         return true;
     }
-    
+
     @Override
-    public IPeriod unionWith(IPeriod period) {
-        
-        if(!this.isIntersect(period)){
-            return null;
+    public IPeriod unionWith(IPeriod period) throws IllegalArgumentException {
+        if(this.getBeginTime().difference(period.getEndTime()) > 0 || period.getBeginTime().difference(this.getEndTime()) > 0)
+        {
+            throw new IllegalArgumentException("Periodes hebben een gap er tussen zitten.");
         }
         
-        Time t = new Time(1,1,1,1,1);
-        Period2 newp = new Period2(t,new Time(1,1,1,1,1));
-        if(this.bt.compareTo(period.getBeginTime())<=0){
+        if (!this.isPartOf(period)) {
+            return this;
+        }
+
+        Time t = new Time(1, 1, 1, 1, 1);
+        Period2 newp = new Period2(t, new Time(1, 1, 1, 1, 1));
+        if (this.bt.compareTo(period.getBeginTime()) <= 0) {
             newp.setBeginTime(bt);
-        }
-        else{
+        } else {
             newp.setBeginTime(period.getBeginTime());
         }
-        if(this.getEndTime().compareTo(period.getEndTime())<=0){
+        if (this.getEndTime().compareTo(period.getEndTime()) <= 0) {
             newp.setEndTime(period.getEndTime());
-        }else{
+        } else {
             newp.setEndTime(this.getEndTime());
         }
         return null;
@@ -108,28 +113,28 @@ public class Period2 implements IPeriod{
     public IPeriod intersectionWith(IPeriod period) {
         ITime btnew;
         ITime etnew;
-       if(!this.isIntersect(period)){
-           return null;
-       }
-       if(this.isPartOf(period)){
-           return this;
-       }
-       if(period.isPartOf(this)){
-           return period;
-       }
-       
-       if(this.getBeginTime().compareTo(period.getBeginTime())>0){
-           btnew = this.getBeginTime();
-           etnew = period.getEndTime();
-           return new Period2(btnew,etnew);
-       }
-       if(this.getBeginTime().compareTo(period.getBeginTime())<0){
-           btnew = period.getBeginTime();
-           etnew = this.getEndTime();
-           return new Period2(btnew,etnew);
-       }
-       return null;
-       
+        if (!this.isIntersect(period)) {
+            return null;
+        }
+        if (this.isPartOf(period)) {
+            return this;
+        }
+        if (period.isPartOf(this)) {
+            return period;
+        }
+
+        if (this.getBeginTime().compareTo(period.getBeginTime()) > 0) {
+            btnew = this.getBeginTime();
+            etnew = period.getEndTime();
+            return new Period2(btnew, etnew);
+        }
+        if (this.getBeginTime().compareTo(period.getBeginTime()) < 0) {
+            btnew = period.getBeginTime();
+            etnew = this.getEndTime();
+            return new Period2(btnew, etnew);
+        }
+        return null;
+
     }
-    
+
 }
