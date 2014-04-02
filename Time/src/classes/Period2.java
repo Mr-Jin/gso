@@ -85,56 +85,50 @@ public class Period2 implements IPeriod {
 
     @Override
     public IPeriod unionWith(IPeriod period) throws IllegalArgumentException {
-        if(this.getBeginTime().difference(period.getEndTime()) > 0 || period.getBeginTime().difference(this.getEndTime()) > 0)
+        
+        if(this.getEndTime().difference(period.getBeginTime()) > 0 || period.getEndTime().difference(this.getBeginTime()) > 0)
         {
             throw new IllegalArgumentException("Periodes hebben een gap er tussen zitten.");
         }
         
-        if (!this.isPartOf(period)) {
-            return this;
-        }
-
+        
         Time t = new Time(1, 1, 1, 1, 1);
         Period2 newp = new Period2(t, new Time(1, 1, 1, 1, 1));
-        if (this.bt.compareTo(period.getBeginTime()) <= 0) {
+        if (this.bt.difference(period.getBeginTime()) >= 0) {
             newp.setBeginTime(bt);
         } else {
             newp.setBeginTime(period.getBeginTime());
         }
-        if (this.getEndTime().compareTo(period.getEndTime()) <= 0) {
+        if (this.getEndTime().difference(period.getEndTime()) >= 0) {
             newp.setEndTime(period.getEndTime());
         } else {
             newp.setEndTime(this.getEndTime());
         }
-        return null;
+        return newp;
     }
 
     @Override
-    public IPeriod intersectionWith(IPeriod period) {
-        ITime btnew;
-        ITime etnew;
-        if (!this.isIntersect(period)) {
-            return null;
+    public IPeriod intersectionWith(IPeriod period) throws IllegalArgumentException{
+        
+        if(this.getEndTime().difference(period.getBeginTime()) > 0 || period.getEndTime().difference(this.getBeginTime()) > 0)
+        {
+            throw new IllegalArgumentException("Periodes hebben een gap er tussen zitten.");
         }
-        if (this.isPartOf(period)) {
-            return this;
+        
+        
+        Time t = new Time(1, 1, 1, 1, 1);
+        Period2 newp = new Period2(t, new Time(1, 1, 1, 1, 1));
+        if (this.bt.difference(period.getBeginTime()) <= 0) {
+            newp.setBeginTime(bt);
+        } else {
+            newp.setBeginTime(period.getBeginTime());
         }
-        if (period.isPartOf(this)) {
-            return period;
+        if (this.getEndTime().difference(period.getEndTime()) <= 0) {
+            newp.setEndTime(period.getEndTime());
+        } else {
+            newp.setEndTime(this.getEndTime());
         }
-
-        if (this.getBeginTime().compareTo(period.getBeginTime()) > 0) {
-            btnew = this.getBeginTime();
-            etnew = period.getEndTime();
-            return new Period2(btnew, etnew);
-        }
-        if (this.getBeginTime().compareTo(period.getBeginTime()) < 0) {
-            btnew = period.getBeginTime();
-            etnew = this.getEndTime();
-            return new Period2(btnew, etnew);
-        }
-        return null;
-
+        return newp;
     }
 
 }

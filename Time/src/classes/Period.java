@@ -21,7 +21,7 @@ public class Period implements IPeriod {
     public Period(ITime bt, ITime et) throws IllegalArgumentException {
         if (bt.difference(et) < 0) {
             throw new IllegalArgumentException("Begin tijd mag niet na Eindtijd komen");
-        
+
         } else {
             this.bt = bt;
             this.et = et;
@@ -73,9 +73,8 @@ public class Period implements IPeriod {
     }
 
     @Override
-    public IPeriod unionWith(IPeriod period) throws IllegalArgumentException{
-        if(this.getBeginTime().difference(period.getEndTime()) > 0 || period.getBeginTime().difference(this.getEndTime()) > 0)
-        {
+    public IPeriod unionWith(IPeriod period) throws IllegalArgumentException {
+        if (this.getEndTime().difference(period.getBeginTime()) > 0 || period.getEndTime().difference(this.getBeginTime()) > 0) {
             throw new IllegalArgumentException("Periodes hebben een gap er tussen zitten.");
         }
 
@@ -83,18 +82,14 @@ public class Period implements IPeriod {
         Time t = new Time(1, 1, 1, 1, 1);
         Period p = new Period(t, new Time(1, 1, 1, 1, 1));
 
-        // als deze periode in de andere periode ligt wordt deze periode terug gegeven
-        if (!this.isPartOf(period)) {
-            return this;
-        }
         // voor het setten van de begintijd van de te returnen periode
-        if (period.getBeginTime().compareTo(this.getBeginTime()) <= 0) {
+        if (period.getBeginTime().difference(this.getBeginTime()) >= 0) {
             p.setBeginTime(period.getBeginTime());
         } else {
             p.setBeginTime(this.getBeginTime());
         }
         // voor het setten van de eindtijd van de te returnen periode
-        if (period.getEndTime().compareTo(this.getEndTime()) >= 0) {
+        if (period.getEndTime().difference(this.getEndTime()) <= 0) {
             p.setEndTime(period.getEndTime());
         } else {
             p.setEndTime(this.getEndTime());
@@ -110,24 +105,33 @@ public class Period implements IPeriod {
 
     @Override
     public IPeriod intersectionWith(IPeriod period) {
-        Calendar thisEndCal = Calendar.getInstance();
-        thisEndCal.setTimeInMillis(0);
-        thisEndCal.set(period.getEndTime().getYear(), period.getEndTime().getMonth(), period.getEndTime().getDay(), period.getEndTime().getHours(), period.getEndTime().getMinutes());
-
-        Calendar periodBeginCal = Calendar.getInstance();
-        periodBeginCal.setTimeInMillis(0);
-        periodBeginCal.set(period.getBeginTime().getYear(), period.getBeginTime().getMonth(), period.getBeginTime().getDay(), period.getBeginTime().getHours(), period.getBeginTime().getMinutes());
-
-        if (thisEndCal.after(periodBeginCal)) {
-            if (period.length() > this.length()) {
-                return period;
-            } else {
-                return this;
-            }
-        } else {
-            return null;
+        if (this.getEndTime().difference(period.getBeginTime()) > 0 || period.getEndTime().difference(this.getBeginTime()) > 0) {
+            throw new IllegalArgumentException("Periodes hebben een gap er tussen zitten.");
         }
 
+        //maakt de nieuwe terug te geven periode aan met "lege" tijden
+        Time t = new Time(1, 1, 1, 1, 1);
+        Period p = new Period(t, new Time(1, 1, 1, 1, 1));
+
+        // voor het setten van de begintijd van de te returnen periode
+        if (period.getBeginTime().difference(this.getBeginTime()) >= 0) {
+            p.setBeginTime(period.getBeginTime());
+        } else {
+            p.setBeginTime(this.getBeginTime());
+        }
+        // voor het setten van de eindtijd van de te returnen periode
+        if (period.getEndTime().difference(this.getEndTime()) >= 0) {
+            p.setEndTime(period.getEndTime());
+        } else {
+            p.setEndTime(this.getEndTime());
+        }
+
+        // mocht er ergens iets fout gegaan zijn en de tijden niet aangepast zijn wordt dat hiermee gecontroleerd
+        if (p.getBeginTime() != t) {
+            return p;
+        }
+
+        return null;
     }
 
 }
